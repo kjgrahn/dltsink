@@ -1,0 +1,74 @@
+.TH dltsink 1 "JAN 2026" "DLTSINK" "User Manuals"
+.
+.
+.SH "NAME"
+.
+dltsink \- send DLT log messages to a log file
+.
+.
+.SH "SYNOPSIS"
+.
+.B dltsink
+.RB [ \-p
+.IR port ]
+.RB [ \-o
+.IR file ]
+.I host
+.
+.br
+.B dltsink
+.B --help
+.
+.br
+.B dltsink
+.B --version
+.
+.
+.SH "DESCRIPTION"
+.
+.B DLT,
+.IR "COVESA Diagnostic Log and Trace" ,
+is a vaguely syslog-like logging system used in cars.
+.B dltsink
+connects to the dlt daemon
+.RB ( dlt-daemon (1))
+and dumps log messages to a syslog-like file, as soon as they appear.
+That is, it lets you work with dlt the way you would work with syslog,
+using standard Unix tools like
+.BR less (1),
+.BR tail (1),
+.BR grep (1)
+and
+.BR perl (1).
+.
+.PP
+DLT comes with a
+.BR dlt-receive (1)
+utility which is similar, but that one easily loses contact with the daemon
+if it restarts.
+
+
+
+.SH "NOTES"
+.
+"Those who do not understand Unix are condemned to reinvent it, poorly."
+\[em] Henry Spencer
+.
+.
+.SH "AUTHOR"
+.
+J\(:orgen Grahn \[fo]grahn@snipabacken.se\[fc].
+.
+.
+.SH "LICENSE"
+.
+The GNU General Public License (GPL) version 2 or (at your option) version 3.
+.
+.
+.SH "SEE ALSO"
+.
+.BR dlt-daemon (1),
+.BR dlt-system (1),
+.BR rsyslogd (8).
+.PP
+\[fo]https://github.com/COVESA/dlt-daemon\[fc].
