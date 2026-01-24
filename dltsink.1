@@ -1,14 +1,23 @@
+.ss 12 0
+.de BP
+.IP \\fB\\$*
+..
+.
+.ds COVESA \s-1COVESA\s0
+.
 .TH dltsink 1 "JAN 2026" "DLTSINK" "User Manuals"
 .
 .
 .SH "NAME"
 .
-dltsink \- send DLT log messages to a log file
+dltsink \- send DLT log messages to stdout or a log file
 .
 .
 .SH "SYNOPSIS"
 .
 .B dltsink
+.RB [ \-c ]
+.RB [ \-b ]
 .RB [ \-p
 .IR port ]
 .RB [ \-o
@@ -27,13 +36,15 @@ dltsink \- send DLT log messages to a log file
 .SH "DESCRIPTION"
 .
 .B DLT,
-.IR "COVESA Diagnostic Log and Trace" ,
+.IR "\*[COVESA] Diagnostic Log and Trace" ,
 is a vaguely syslog-like logging system used in cars.
 .B dltsink
-connects to the dlt daemon
-.RB ( dlt-daemon (1))
-and dumps log messages to a syslog-like file, as soon as they appear.
-That is, it lets you work with dlt the way you would work with syslog,
+connects to the DLT daemon,
+.BR dlt-daemon (1),
+and dumps log messages to stdout or a file in a syslog-like text format,
+as soon as they appear.
+.PP
+That is, it lets you work with DLT the way you would work with syslog,
 using standard Unix tools like
 .BR less (1),
 .BR tail (1),
@@ -46,13 +57,86 @@ DLT comes with a
 .BR dlt-receive (1)
 utility which is similar, but that one easily loses contact with the daemon
 if it restarts.
-
-
-
+.B dltsink
+tries to reconnect quickly, in order not to lose too many log messages.
+.
+.
+.SS "Output"
+.
+.B dltsink
+prints logs along the lines of
+.IP
+.ft CW
+.nf
+16:40:20.012 connected
+16:40:21.783 APP1 CTX1 info  VELOX NEB
+16:40:24.784 APP1 CTX1 warn  hungrig och avtrubbad
+16:40:30.788 APP1 CTX1 info  Operating Thetan
+16:40:33.794 APP1 CTX1 debug Narn bat squad
+...
+.fi
+.PP
+That is, it prints the timestamp, the application and context IDs
+(padded to four letters with dashes, if necessary),
+the log level and the message itself.
+The message text is printed as-is, with newlines and escape sequences.
+Only trailing whitespace is removed.
+For brevity, the date, sequence number, time since system start, and ECU ID,
+are omitted.
+.PP
+The timestamp records the time the message arrived to the sink, as local time.
+That's why it's printed with just millisecond resolution:
+the network latency and latency through dlt-daemon would make e.g. microsecond
+resolution meaningless and misleading.
+.
+.
+.SH "OPTIONS"
+.
+.BP \-c
+Colorize the output somewhat.
+.
+.BP \-b
+Disable flushing.
+By default,
+.B dltsink
+flushes output after each log line, so you can use it in pipelines and still see
+each line as generated, rather than later in a big chunk.
+.
+.BP \-p\ \fIport
+Connect to TCP port
+.IR port ,
+instead of the default 3490.
+.
+.BP \-o\ \fIfile
+Write log messages to
+.I file
+instead of stdout.
+.
+.
 .SH "NOTES"
 .
 "Those who do not understand Unix are condemned to reinvent it, poorly."
+.br
 \[em] Henry Spencer
+.
+.
+.SH "BUGS"
+.
+.B dltsink
+could be more aggressive about connecting and disconnecting. For
+example, a dead TCP connection won't be detected quickly, since
+dltsink doesn't send any application-level probes (and I don't know
+whether the protocol would support doing that).
+.PP
+As noted above, log messages don't have proper timestamps. The time
+logged is when
+.B dltsink
+reads the message.
+This is also how the \*[COVESA] tools do it.
+It would be possible to improve on this, by measuring the smallest distance
+between the message and retrieval timestamps, while watching out for wraparound.
+.PP
+The protocol is not documented, and the implementation here is na\(:ive.
 .
 .
 .SH "AUTHOR"
@@ -68,7 +152,7 @@ The GNU General Public License (GPL) version 2 or (at your option) version 3.
 .SH "SEE ALSO"
 .
 .BR dlt-daemon (1),
-.BR dlt-system (1),
+.BR dlt-receive (1),
 .BR rsyslogd (8).
 .PP
 \[fo]https://github.com/COVESA/dlt-daemon\[fc].
