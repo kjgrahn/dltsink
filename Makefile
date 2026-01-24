@@ -26,13 +26,13 @@ check: tests
 checkv: tests
 	valgrind -q ./tests -v
 
-libsink.a: foo.o
+libsink.a: timeval.o
 	$(AR) $(ARFLAGS) $@ $^
 
 dltsink: dltsink.o libsink.a
 	$(CXX) $(CXXFLAGS) -o $@ dltsink.o -L. -lsink
 
-libtest.a: test/foo.o
+libtest.a: test/timeval.o
 	$(AR) $(ARFLAGS) $@ $^
 
 test/%.o: CPPFLAGS+=-I.
