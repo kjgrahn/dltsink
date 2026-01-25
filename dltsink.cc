@@ -45,6 +45,12 @@ namespace {
 	return {s, suseconds_t((seconds-s)*1e6) };
     }
 
+    void sleep(std::chrono::microseconds dt)
+    {
+	/* might be interrupted, but never mind */
+	(void)usleep(dt.count());
+    }
+
     /**
      * Set the socket(7) SO_RCVTIMEO and SO_SNDTIMEO.
      */
@@ -89,6 +95,11 @@ namespace {
 	return n;
     }
 
+    void dltsink(Log&, const addrinfo*);
+
+    /* Try forever to connect and reconnect to the dlt daemon, and
+     * while connected, log everything.
+     */
     template <class Arg>
     int dltsink(std::ostream& err, const Arg& arg)
     {
@@ -108,14 +119,29 @@ namespace {
 	    return 1;
 	}
 
+	while (true) {
+	    dltsink(log, ais);
+	}
+
+	freeaddrinfo(ais);
+	return 0;
+    }
+
+    void dltsink(Log& log, const addrinfo* ais)
+    {
+	const timeval t0 = now();
 	const Socket fd {connect_one(ais, 3.14)};
 	timeval t = now();
 
-	freeaddrinfo(ais);
 	if(fd.invalid()) {
-	    err << "error: '" << arg.host << "': cannot connect: "
-		<< fd.error() << '\n';
-	    return false;
+	    log.connect_fail(t, fd.error());
+	    if (t - t0 < std::chrono::seconds{1}) {
+		/* The connect failed quickly: wait a bit before
+		 * returning, because returning implies retrying.
+		 */
+		sleep(std::chrono::seconds{1});
+	    }
+	    return;
 	}
 
 	log.connect(t);
@@ -136,8 +162,6 @@ namespace {
 	    rx.consume(size(v));
 	}
 	log.disconnect(t);
-
-	return 0;
     }
 }
 

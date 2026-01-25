@@ -20,6 +20,7 @@ struct Log {
     explicit Log(const Arg& arg);
 
     void connect(const timeval&);
+    void connect_fail(const timeval&, const std::string& err);
     void disconnect(const timeval&);
     void log(const timeval&, const dlt::msg::Log&);
 

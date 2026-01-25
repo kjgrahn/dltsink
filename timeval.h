@@ -29,8 +29,11 @@
 #define TCP_TIMEVAL_H
 
 #include <iosfwd>
+#include <chrono>
 
 struct timeval;
 std::ostream& operator<< (std::ostream& os, const struct timeval& val);
+
+std::chrono::microseconds operator- (const timeval& a, const timeval& b);
 
 #endif

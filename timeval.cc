@@ -48,3 +48,12 @@ std::ostream& operator<< (std::ostream& os, const struct timeval& val)
     sprintf(buf, ".%03u", msec);
     return os << buf;
 }
+
+std::chrono::microseconds operator- (const timeval& a, const timeval& b)
+{
+    const auto as = std::chrono::seconds {a.tv_sec};
+    const auto bs = std::chrono::seconds {b.tv_sec};
+    const auto au = std::chrono::microseconds {a.tv_usec};
+    const auto bu = std::chrono::microseconds {b.tv_usec};
+    return (as + au) - (bs + bu);
+}

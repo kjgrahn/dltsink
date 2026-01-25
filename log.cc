@@ -18,6 +18,12 @@ void Log::connect(const timeval& tv)
     end();
 }
 
+void Log::connect_fail(const timeval& tv, const std::string& err)
+{
+    os() << tv << SP11 << "connect failed: " << err << '\n';
+    end();
+}
+
 void  Log::disconnect(const timeval& tv)
 {
     os() << tv << SP11 << "disconnected\n";
