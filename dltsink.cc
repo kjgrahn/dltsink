@@ -157,9 +157,6 @@ int main(int argc, char ** argv)
 	{0, 0, 0, 0}
     };
 
-    std::cin.sync_with_stdio(false);
-    std::cout.sync_with_stdio(false);
-
     struct {
 	bool colorize = false;
 	bool flush = true;
