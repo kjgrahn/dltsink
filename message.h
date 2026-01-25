@@ -6,6 +6,7 @@
 #define DLTSINK_MESSAGE_H
 
 #include "range.h"
+#include "color.h"
 
 #include <array>
 #include <string>
@@ -33,7 +34,7 @@ namespace dlt {
 	    explicit Log(Range);
 	    bool valid() const { return ts.count(); }
 
-	    std::ostream& put(std::ostream&, const timeval&) const;
+	    std::ostream& put(std::ostream&, const timeval&, const Color&) const;
 
 	    Tag ecu;
 	    Duration ts;

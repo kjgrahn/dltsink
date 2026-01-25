@@ -10,6 +10,7 @@
 
 #include "message.h"
 #include "timeval.h"
+#include "color.h"
 
 /**
  * A text log similar to syslog, either written to file or
@@ -27,7 +28,12 @@ struct Log {
     bool broken = false;
 
 private:
-    const bool colorize;
+    const struct {
+	Color yellow;
+	Color green;
+	Color blue;
+	Color normal;
+    } colors;
     const bool flush;
     std::ofstream of;
 
@@ -37,7 +43,10 @@ private:
 
 template <class Arg>
 Log::Log(const Arg& arg)
-    : colorize {arg.colorize},
+    : colors { Color {arg.colorize, "0;33m"},
+	       Color {arg.colorize, "0;32m"},
+	       Color {arg.colorize, "0;36m"},
+	       Color {false, nullptr} },
       flush {arg.flush}
 {
     if (arg.filename.size()) {

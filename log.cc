@@ -14,37 +14,26 @@ namespace {
 
 void Log::connect(const timeval& tv)
 {
-    os() << tv << SP11 << "connected\n";
+    const Color& c = colors.blue;
+    os() << tv << SP11
+	 << c << "connected" << c.reset << '\n';
     end();
 }
 
 void Log::connect_fail(const timeval& tv, const std::string& err)
 {
-    os() << tv << SP11 << "connect failed: " << err << '\n';
+    const Color& c = colors.blue;
+    os() << tv << SP11
+	 << c << "connect failed: " << err << c.reset << '\n';
     end();
 }
 
 void  Log::disconnect(const timeval& tv)
 {
-    os() << tv << SP11 << "disconnected\n";
+    const Color& c = colors.blue;
+    os() << tv << SP11
+	 << c << "disconnected" << c.reset << '\n';
     end();
-}
-
-void Log::log(const timeval& tv, const dlt::msg::Log& msg)
-{
-    msg.put(os(), tv);
-    end();
-}
-
-std::ostream& Log::os()
-{
-    if (of.is_open()) return of;
-    return std::cout;
-}
-
-void Log::end()
-{
-    if (flush) os().flush();
 }
 
 namespace {
@@ -61,6 +50,38 @@ namespace {
 	default: return "???? ";
 	}
     }
+
+    template <class Colors>
+    const Color& select(dlt::msg::LogLevel val,
+			const Colors& cc)
+    {
+	switch (val.val) {
+	case 1:
+	case 2:
+	case 3:  return cc.yellow;
+	case 5:
+	case 6:  return cc.green;
+	default: return cc.normal;
+	}
+    }
+}
+
+void Log::log(const timeval& tv, const dlt::msg::Log& msg)
+{
+    const Color& c = select(msg.level, colors);
+    msg.put(os(), tv, c);
+    end();
+}
+
+std::ostream& Log::os()
+{
+    if (of.is_open()) return of;
+    return std::cout;
+}
+
+void Log::end()
+{
+    if (flush) os().flush();
 }
 
 std::ostream& operator<< (std::ostream& os, const dlt::msg::Tag& val)
@@ -74,12 +95,13 @@ std::ostream& operator<< (std::ostream& os, const dlt::msg::LogLevel& val)
     return os << str(val);
 }
 
-std::ostream& dlt::msg::Log::put(std::ostream& os, const timeval& tv) const
+std::ostream& dlt::msg::Log::put(std::ostream& os,
+				 const timeval& tv, const Color& c) const
 {
     os << tv
        << SP << app
        << SP << ctx
-       << SP << level
+       << SP << c << level << c.reset
        << SP << text
        << '\n';
     return os;
