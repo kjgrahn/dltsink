@@ -20,11 +20,19 @@ namespace {
 	return msin & 0x0e;
     }
 
+    bool isprint(unsigned ch)
+    {
+	return std::isprint(ch);
+    }
+
     template <size_t N>
     std::array<char, N> get(const uint8_t* p)
     {
 	std::array<char, N> res;
-	for (char& c : res) c = *p++;
+	for (char& c : res) {
+	    c = *p++;
+	    if (!isprint(c)) c = '-';
+	}
 	return res;
     }
 
