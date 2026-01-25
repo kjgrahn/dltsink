@@ -26,6 +26,7 @@ check: tests
 checkv: tests
 	valgrind -q ./tests -v
 
+libsink.a: socket.o
 libsink.a: timeval.o
 libsink.a: range.o
 	$(AR) $(ARFLAGS) $@ $^
