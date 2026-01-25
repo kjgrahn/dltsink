@@ -27,6 +27,7 @@ checkv: tests
 	valgrind -q ./tests -v
 
 libsink.a: timeval.o
+libsink.a: range.o
 	$(AR) $(ARFLAGS) $@ $^
 
 dltsink: dltsink.o libsink.a
