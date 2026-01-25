@@ -9,17 +9,18 @@
 namespace {
 
     const char SP = ' ';
+    const char SP11[] = "           ";
 }
 
 void Log::connect(const timeval& tv)
 {
-    os() << tv << SP << "connected\n";
+    os() << tv << SP11 << "connected\n";
     end();
 }
 
 void  Log::disconnect(const timeval& tv)
 {
-    os() << tv << SP << "disconnected\n";
+    os() << tv << SP11 << "disconnected\n";
     end();
 }
 
