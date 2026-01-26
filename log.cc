@@ -9,26 +9,27 @@
 namespace {
 
     const char SP = ' ';
+    const char SP2[] = "  ";
 }
 
 void Log::connect(const timeval& tv)
 {
     const Color& c = colors.blue;
-    os() << tv << SP << c << "connected" << c.reset << '\n';
+    os() << tv << SP2 << c << "connected" << c.reset << '\n';
     end();
 }
 
 void Log::connect_fail(const timeval& tv, const std::string& err)
 {
     const Color& c = colors.blue;
-    os() << tv << SP << c << "connect failed: " << err << c.reset << '\n';
+    os() << tv << SP2 << c << "connect failed: " << err << c.reset << '\n';
     end();
 }
 
 void  Log::disconnect(const timeval& tv)
 {
     const Color& c = colors.blue;
-    os() << tv << SP << c << "disconnected" << c.reset << '\n';
+    os() << tv << SP2 << c << "disconnected" << c.reset << '\n';
     end();
 }
 
@@ -95,12 +96,12 @@ std::ostream& dlt::msg::Log::put(std::ostream& os,
 				 const timeval& tv, bool with_ecu,
 				 const Color& c) const
 {
-    os << tv;
-    if (with_ecu) os << SP << ecu;
-    os << SP << app
-       << SP << ctx
-       << SP << c << level << c.reset
-       << SP << text
+    os << tv << SP2;
+    if (with_ecu) os << ecu << SP;
+    os << app << SP
+       << ctx << SP
+       << c << level << c.reset << SP
+       << text
        << '\n';
     return os;
 }
