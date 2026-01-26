@@ -162,6 +162,13 @@ namespace {
 	    rx.consume(size(v));
 	}
 	log.disconnect(t);
+
+	if (t - t0 < std::chrono::seconds{1}) {
+	    /* Very short session: wait a bit before returning,
+	     * because the next one might become just as short.
+	     */
+	    sleep(std::chrono::seconds{2});
+	}
     }
 }
 
