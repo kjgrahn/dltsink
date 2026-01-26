@@ -34,7 +34,8 @@ namespace dlt {
 	    explicit Log(Range);
 	    bool valid() const { return ts.count(); }
 
-	    std::ostream& put(std::ostream&, const timeval&, const Color&) const;
+	    std::ostream& put(std::ostream&, const timeval&,
+			      bool with_ecu, const Color&) const;
 
 	    Tag ecu;
 	    Duration ts;

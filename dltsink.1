@@ -17,6 +17,7 @@ dltsink \- send DLT log messages to stdout or a log file
 .
 .B dltsink
 .RB [ \-c ]
+.RB [ \-e ]
 .RB [ \-b ]
 .RB [ \-p
 .IR port ]
@@ -68,7 +69,7 @@ prints logs along the lines of
 .IP
 .ft CW
 .nf
-16:40:20.012           connected
+16:40:20.012 connected
 16:40:21.783 APP1 CTX1 info  VELOX NEB
 16:40:24.784 APP1 CTX1 warn  hungrig och avtrubbad
 16:40:30.788 APP1 CTX1 info  Operating Thetan
@@ -81,8 +82,11 @@ That is, it prints the timestamp, the application and context IDs
 the log level and the message itself.
 The message text is printed as-is, with newlines and escape sequences.
 Only trailing whitespace is removed.
-For brevity, the date, sequence number, time since system start, and ECU ID,
+For brevity, the date, sequence number and time since system start
 are omitted.
+The ECU ID is omitted by default, but is included if the
+.B \-e
+option is supplied.
 .PP
 The timestamp records the time the message arrived to the sink, as local time.
 That's why it's printed with just millisecond resolution:
@@ -94,6 +98,9 @@ resolution meaningless and misleading.
 .
 .BP \-c
 Colorize the output somewhat.
+.
+.BP \-e
+Include the ECU ID as a column in the output.
 .
 .BP \-b
 Disable flushing.

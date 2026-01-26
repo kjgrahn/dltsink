@@ -176,12 +176,12 @@ int main(int argc, char ** argv)
 {
     const std::string prog = argv[0];
     const std::string usage = "usage: "
-	+ prog + " [-c] [-b] [-p port] [-o file] host\n"
+	+ prog + " [-c] [-e] [-b] [-p port] [-o file] host\n"
 	"       "
 	+ prog + " --help\n"
 	"       "
 	+ prog + " --version";
-    const char optstring[] = "cbp:o:";
+    const char optstring[] = "cebp:o:";
     const struct option long_options[] = {
 	{"version", 0, 0, 'V'},
 	{"help", 0, 0, 'H'},
@@ -190,6 +190,7 @@ int main(int argc, char ** argv)
 
     struct {
 	bool colorize = false;
+	bool ecu = false;
 	bool flush = true;
 	std::string host;
 	std::string port = "3490";
@@ -203,6 +204,9 @@ int main(int argc, char ** argv)
 	switch(ch) {
 	case 'c':
 	    arg.colorize = true;
+	    break;
+	case 'e':
+	    arg.ecu = true;
 	    break;
 	case 'b':
 	    arg.flush = false;
