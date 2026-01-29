@@ -17,6 +17,9 @@ dltsink \- send DLT log messages to stdout or a log file
 .
 .B dltsink
 .RB [ \-cCEb ]
+.RB [ \-a
+.IR app ]
+\&...
 .RB [ \-p
 .IR port ]
 .RB [ \-o
@@ -109,6 +112,17 @@ By default,
 .B dltsink
 flushes output after each log line, so you can use it in pipelines and still see
 each line as generated, rather than later in a big chunk.
+.
+.BP \-a\ \fIapp
+Filter on
+.IR app ;
+include log messages tagged with a specific four-letter application ID.
+This option can be repeated, if you're interested in several applications.
+However, for more elaborate filtering, you're better off piping the output through
+.BR grep (1),
+.BR perl (1)
+or
+similar.
 .
 .BP \-p\ \fIport
 Connect to TCP port
@@ -240,6 +254,7 @@ The GNU General Public License (GPL) version 2 or (at your option) version 3.
 .
 .BR dlt-daemon (1),
 .BR dlt-receive (1),
+.BR grep (1),
 .BR rsyslogd (8).
 .PP
 \[fo]https://github.com/COVESA/dlt-daemon\[fc].

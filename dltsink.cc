@@ -18,6 +18,7 @@
 #include "rxstream.h"
 #include "message.h"
 #include "log.h"
+#include "grep.h"
 
 namespace {
 
@@ -176,12 +177,12 @@ int main(int argc, char ** argv)
 {
     const std::string prog = argv[0];
     const std::string usage = "usage: "
-	+ prog + " [-cCEb] [-p port] [-o file] host\n"
+	+ prog + " [-cCEb] [-a app] ... [-p port] [-o file] host\n"
 	"       "
 	+ prog + " --help\n"
 	"       "
 	+ prog + " --version";
-    const char optstring[] = "cCEbp:o:";
+    const char optstring[] = "cCEba:p:o:";
     const struct option long_options[] = {
 	{"version", 0, 0, 'V'},
 	{"help", 0, 0, 'H'},
@@ -193,6 +194,7 @@ int main(int argc, char ** argv)
 	bool ctx = true;
 	bool ecu = false;
 	bool flush = true;
+	Grep grep;
 	std::string host;
 	std::string port = "3490";
 	std::string filename;
@@ -214,6 +216,9 @@ int main(int argc, char ** argv)
 	    break;
 	case 'b':
 	    arg.flush = false;
+	    break;
+	case 'a':
+	    arg.grep.add(optarg);
 	    break;
 	case 'p':
 	    arg.port = optarg;

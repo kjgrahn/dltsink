@@ -65,6 +65,8 @@ namespace {
 
 void Log::log(const timeval& tv, const dlt::msg::Log& msg)
 {
+    if (!grep.match(msg.app)) return;
+
     const Color& c = select(msg.level, colors);
     msg.put(os(), tv,
 	    with.ctx, with.ecu, c);

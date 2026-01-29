@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 
+#include "grep.h"
 #include "message.h"
 #include "timeval.h"
 #include "color.h"
@@ -39,6 +40,7 @@ private:
 	bool ctx;
 	bool ecu;
     } with;
+    const Grep& grep;
     std::ofstream of;
 
     std::ostream& os();
@@ -52,7 +54,8 @@ Log::Log(const Arg& arg)
 	       Color {arg.colorize, "0;36m"},
 	       Color {false, nullptr} },
       flush {arg.flush},
-      with {arg.ctx, arg.ecu}
+      with {arg.ctx, arg.ecu},
+      grep {arg.grep}
 {
     if (arg.filename.size()) {
 	of.open(arg.filename);
