@@ -176,12 +176,12 @@ int main(int argc, char ** argv)
 {
     const std::string prog = argv[0];
     const std::string usage = "usage: "
-	+ prog + " [-c] [-e] [-b] [-p port] [-o file] host\n"
+	+ prog + " [-cEb] [-p port] [-o file] host\n"
 	"       "
 	+ prog + " --help\n"
 	"       "
 	+ prog + " --version";
-    const char optstring[] = "cebp:o:";
+    const char optstring[] = "cEbp:o:";
     const struct option long_options[] = {
 	{"version", 0, 0, 'V'},
 	{"help", 0, 0, 'H'},
@@ -205,7 +205,7 @@ int main(int argc, char ** argv)
 	case 'c':
 	    arg.colorize = true;
 	    break;
-	case 'e':
+	case 'E':
 	    arg.ecu = true;
 	    break;
 	case 'b':
