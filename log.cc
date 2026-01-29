@@ -66,7 +66,8 @@ namespace {
 void Log::log(const timeval& tv, const dlt::msg::Log& msg)
 {
     const Color& c = select(msg.level, colors);
-    msg.put(os(), tv, with_ecu, c);
+    msg.put(os(), tv,
+	    with.ctx, with.ecu, c);
     end();
 }
 
@@ -92,15 +93,15 @@ std::ostream& operator<< (std::ostream& os, const dlt::msg::LogLevel& val)
     return os << str(val);
 }
 
-std::ostream& dlt::msg::Log::put(std::ostream& os,
-				 const timeval& tv, bool with_ecu,
+std::ostream& dlt::msg::Log::put(std::ostream& os, const timeval& tv,
+				 bool with_ctx, bool with_ecu,
 				 const Color& c) const
 {
     os << tv << SP2;
     if (with_ecu) os << ecu << SP;
-    os << app << SP
-       << ctx << SP
-       << c << level << c.reset << SP
+    os << app << SP;
+    if (with_ctx) os << ctx << SP;
+    os << c << level << c.reset << SP
        << text
        << '\n';
     return os;

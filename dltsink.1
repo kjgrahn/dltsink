@@ -16,7 +16,7 @@ dltsink \- send DLT log messages to stdout or a log file
 .SH "SYNOPSIS"
 .
 .B dltsink
-.RB [ \-cEb ]
+.RB [ \-cCEb ]
 .RB [ \-p
 .IR port ]
 .RB [ \-o
@@ -96,6 +96,9 @@ resolution meaningless and misleading.
 .
 .BP \-c
 Colorize the output somewhat.
+.
+.BP \-C
+Don't include the context ID in the output.
 .
 .BP \-E
 Include the ECU ID as a column in the output.

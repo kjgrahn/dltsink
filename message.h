@@ -35,7 +35,8 @@ namespace dlt {
 	    bool valid() const { return ts.count(); }
 
 	    std::ostream& put(std::ostream&, const timeval&,
-			      bool with_ecu, const Color&) const;
+			      bool with_ctx, bool with_ecu,
+			      const Color&) const;
 
 	    Tag ecu;
 	    Duration ts;

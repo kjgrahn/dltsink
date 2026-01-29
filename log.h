@@ -35,7 +35,10 @@ private:
 	Color normal;
     } colors;
     const bool flush;
-    const bool with_ecu;
+    const struct {
+	bool ctx;
+	bool ecu;
+    } with;
     std::ofstream of;
 
     std::ostream& os();
@@ -49,7 +52,7 @@ Log::Log(const Arg& arg)
 	       Color {arg.colorize, "0;36m"},
 	       Color {false, nullptr} },
       flush {arg.flush},
-      with_ecu {arg.ecu}
+      with {arg.ctx, arg.ecu}
 {
     if (arg.filename.size()) {
 	of.open(arg.filename);
