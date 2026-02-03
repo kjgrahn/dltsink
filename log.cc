@@ -3,6 +3,7 @@
  *
  */
 #include "log.h"
+#include "timestamp.h"
 
 #include <iostream>
 
@@ -28,6 +29,7 @@ void Log::connect_fail(const timeval& tv, const std::string& err)
 
 void  Log::disconnect(const timeval& tv)
 {
+    epoch.reset();
     const Color& c = colors.blue;
     os() << tv << SP2 << c << "disconnected" << c.reset << '\n';
     end();
@@ -61,14 +63,39 @@ namespace {
 	default: return cc.normal;
 	}
     }
+
+    /* Try to find a system time in a message, so we can synchronize
+     * the clocks. Typically returns zero time, meaning we didn't find
+     * any.
+     */
+    dlt::Epoch::Ms system_time(const dlt::msg::Tag app, const dlt::msg::Log& msg)
+    {
+	if (msg.app != app) return {};
+	return ::system_time(msg.text);
+    }
+
+    /* The system timestamp to use for msg: either based on msg.ts and
+     * the Epoch, or else the local processing timestamp.
+     */
+    timeval time_of(const dlt::msg::Log& msg, std::unique_ptr<dlt::Epoch>& epoch, timeval local)
+    {
+	if (!epoch) return local;
+	auto ms = epoch->translate(msg.ts);
+	return to_timeval(ms);
+    }
 }
 
 void Log::log(const timeval& tv, const dlt::msg::Log& msg)
 {
+    auto t = system_time(timesrc, msg);
+    if (t.count()) {
+	epoch = std::make_unique<dlt::Epoch>(msg.ts, t);
+    }
+
     if (!grep.match(msg.app)) return;
 
     const Color& c = select(msg.level, colors);
-    msg.put(os(), tv,
+    msg.put(os(), time_of(msg, epoch, tv),
 	    with.ctx, with.ecu, c);
     end();
 }

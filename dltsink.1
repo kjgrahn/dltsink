@@ -5,7 +5,7 @@
 .
 .ds COVESA \s-1COVESA\s0
 .
-.TH dltsink 1 "JAN 2026" "DLTSINK" "User Manuals"
+.TH dltsink 1 "FEB 2026" "DLTSINK" "User Manuals"
 .
 .
 .SH "NAME"
@@ -20,6 +20,8 @@ dltsink \- send DLT log messages to stdout or a log file
 .RB [ \-a
 .IR app ]
 \&...
+.RB [ \-T
+.IR app ]
 .RB [ \-p
 .IR port ]
 .RB [ \-o
@@ -89,7 +91,10 @@ The ECU ID is omitted by default, but is included if the
 .B \-E
 option is supplied.
 .PP
-The timestamp records the time the message arrived to the sink, as local time.
+Unless the
+.B \-T
+option is used,
+the timestamp records the time the message arrived to the sink, as local time.
 That's why it's printed with just millisecond resolution:
 the network latency and latency through dlt-daemon would make e.g. microsecond
 resolution meaningless and misleading.
@@ -123,6 +128,28 @@ However, for more elaborate filtering, you're better off piping the output throu
 .BR perl (1)
 or
 similar.
+.
+.BP \-T\ \fIapp
+Scan messages from
+.I app
+for clock synchronization log messages.
+Such messages must contain, in the text, a decimal number which represents
+current Unix time in seconds or milliseconds, for example
+.I 1770156044
+or
+.IR 1770156044098 .
+After processing a synchronization message,
+.B dltsink
+knows the meaning of the relative message timestamp, and prints these
+instead of the reception system time.
+.
+.IP
+If
+.B dltsink
+loses connection with the
+.BR dlt-daemon ,
+it assumes the synchronization is lost,
+and reverts to system time.
 .
 .BP \-p\ \fIport
 Connect to TCP port
@@ -206,9 +233,12 @@ info\ (4),
 debug\ (5),
 verbose\ (6).
 .PP
-There appears to be no way to get a real timestamp for the log
+There is no way, in DLT version 1, to get a real timestamp for the log
 messages. The existing timestamps are relative to system startup, with
 no portable way to find out when that happened.
+(But see the
+.B \-T
+option.)
 Also, it's unclear if this relative timestamp is added at the source, or in
 .B dlt-daemon
 when it happens to find the time to process the message.
@@ -230,12 +260,32 @@ dltsink doesn't send any application-level probes (and I don't know
 whether the protocol would support doing that).
 .PP
 As noted above, log messages don't have proper timestamps. The time
-logged is when
+logged is by default when
 .B dltsink
 reads the message.
 This is also how the \*[COVESA] tools do it.
-It would be possible to improve on this, by measuring the smallest distance
+The
+.B \-T
+option lets dltsink use the message timestamps, if certain synchronization log
+messages have established an epoch for them \-
+but these messages would be non-standard.
+.PP
+Also, it would be possible to improve on this, by measuring the smallest distance
 between the message and retrieval timestamps, while watching out for wraparound.
+But none of these methods guarantee a high quality timestamp for every log message.
+.PP
+For the
+.B \-T
+option,
+.B dltsink
+assumes all ECUs share one clock,
+which is a bit of a stretch.
+.
+.PP
+Timestamps are logged with millisecond resolution, but they are available
+with 0.1\ ms resolution, which could perhaps have been useful for measuring
+performance. It would have been harder to interpret, though.
+.
 .PP
 The protocol is not documented, and the implementation here is na\(:ive.
 .

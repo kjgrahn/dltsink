@@ -7,15 +7,20 @@
 
 #include <string>
 #include <fstream>
+#include <memory>
 
 #include "grep.h"
 #include "message.h"
+#include "epoch.h"
 #include "timeval.h"
 #include "color.h"
 
 /**
  * A text log similar to syslog, either written to file or
  * (if an empty file name is given) to stdout.
+ *
+ * With configurable color, columns, filtering on App, time
+ * source and stuff.
  */
 struct Log {
     template <class Arg>
@@ -40,8 +45,12 @@ private:
 	bool ctx;
 	bool ecu;
     } with;
+
     const Grep& grep;
+    const dlt::msg::Tag timesrc;
+
     std::ofstream of;
+    std::unique_ptr<dlt::Epoch> epoch;
 
     std::ostream& os();
     void end();
@@ -55,7 +64,8 @@ Log::Log(const Arg& arg)
 	       Color {false, nullptr} },
       flush {arg.flush},
       with {arg.ctx, arg.ecu},
-      grep {arg.grep}
+      grep {arg.grep},
+      timesrc {arg.timesrc}
 {
     if (arg.filename.size()) {
 	of.open(arg.filename);
