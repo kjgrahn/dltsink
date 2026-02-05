@@ -49,6 +49,16 @@ std::ostream& operator<< (std::ostream& os, const struct timeval& val)
     return os << buf;
 }
 
+timeval to_timeval(std::chrono::microseconds t)
+{
+    const auto s = std::chrono::duration_cast<std::chrono::seconds>(t);
+    const auto us = t - s;
+    timeval tv;
+    tv.tv_sec = s.count();
+    tv.tv_usec = us.count();
+    return tv;
+}
+
 std::chrono::microseconds operator- (const timeval& a, const timeval& b)
 {
     const auto as = std::chrono::seconds {a.tv_sec};

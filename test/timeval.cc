@@ -49,4 +49,13 @@ namespace tv {
 	orchis::assert_eq(str({now(), 999900u}),
 			  "13:17:00.000");
     }
+
+    void chrono_conversion(orchis::TC)
+    {
+	std::chrono::milliseconds ms {123456};
+	const timeval tv = to_timeval(ms);
+
+	// assumes TZ=C
+	orchis::assert_eq(str(tv), "00:02:03.456");
+    }
 }

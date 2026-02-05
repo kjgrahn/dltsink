@@ -22,9 +22,9 @@ install: dltsink dltsink.1
 
 .PHONY: check checkv
 check: tests
-	./tests
+	TZ=C ./tests
 checkv: tests
-	valgrind -q ./tests -v
+	TZ=C valgrind -q ./tests -v
 
 libsink.a: socket.o
 libsink.a: rxstream.o

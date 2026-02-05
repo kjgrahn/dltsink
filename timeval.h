@@ -34,6 +34,8 @@
 struct timeval;
 std::ostream& operator<< (std::ostream& os, const struct timeval& val);
 
+timeval to_timeval(std::chrono::microseconds);
+
 std::chrono::microseconds operator- (const timeval& a, const timeval& b);
 
 #endif
