@@ -34,6 +34,7 @@ libsink.a: color.o
 libsink.a: grep.o
 libsink.a: epoch.o
 libsink.a: timeval.o
+libsink.a: timestamp.o
 libsink.a: range.o
 	$(AR) $(ARFLAGS) $@ $^
 
@@ -41,11 +42,12 @@ dltsink: dltsink.o libsink.a
 	$(CXX) $(CXXFLAGS) -o $@ dltsink.o -L. -lsink
 
 libtest.a: test/timeval.o
+libtest.a: test/timestamp.o
 libtest.a: test/epoch.o
 	$(AR) $(ARFLAGS) $@ $^
 
 test/%.o: CPPFLAGS+=-I.
-test/epoch.o: CXXFLAGS+=-std=c++20
+test/%.o: CXXFLAGS+=-std=c++20
 
 test.cc: libtest.a
 	orchis -o$@ $^
