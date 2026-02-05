@@ -57,7 +57,8 @@ namespace {
 	switch (val.val) {
 	case 1:
 	case 2:
-	case 3:  return cc.yellow;
+	case 3:  return cc.red;
+	case 4:  return cc.normal;
 	case 5:
 	case 6:  return cc.green;
 	default: return cc.normal;

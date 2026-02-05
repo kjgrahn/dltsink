@@ -36,6 +36,7 @@ struct Log {
 private:
     const struct {
 	Color yellow;
+	Color red;
 	Color green;
 	Color blue;
 	Color normal;
@@ -59,6 +60,7 @@ private:
 template <class Arg>
 Log::Log(const Arg& arg)
     : colors { Color {arg.colorize, "0;33m"},
+	       Color {arg.colorize, "1;31m"},
 	       Color {arg.colorize, "0;32m"},
 	       Color {arg.colorize, "0;36m"},
 	       Color {false, nullptr} },
