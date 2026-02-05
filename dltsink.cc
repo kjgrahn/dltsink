@@ -240,7 +240,7 @@ int main(int argc, char ** argv)
 	    arg.filename = optarg;
 	    break;
 	case 'V':
-	    std::cout << prog << " 1.1\n"
+	    std::cout << prog << " 1.2\n"
 		      << "Copyright (c) 2026 Jörgen Grahn\n";
 	    return 0;
 	    break;
