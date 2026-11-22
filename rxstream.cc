@@ -9,6 +9,15 @@
 
 namespace {
 
+    unsigned prefix_of(uint8_t htyp)
+    {
+	switch (htyp >> 5) {
+	case 1: return 2;
+	case 2: return 5;
+	}
+	throw tiff::Wedged {};
+    }
+
     template <class Cont, class It>
     void append(Cont& c, It a, It b)
     {
@@ -24,6 +33,11 @@ void RxStream::feed(const Range r)
 /* Find all complete DLT messages on the stream and return them as
  * Ranges. Throws if there can never be such a message. In that case,
  * you might lose some preceding messages, too.
+ *
+ * This is complicated by DLT v1/v2, specified in the first octet:
+ * v1: hh nn NN NN ...             NNNN is total message length, error if < 4
+ * v2: hh nn nn nn nn NN NN ...    similar, error if < 7
+ *
  */
 std::vector<Range> RxStream::messages() const
 {
@@ -31,9 +45,11 @@ std::vector<Range> RxStream::messages() const
     const uint8_t* a = v.data();
     const auto b = a + v.size();
 
-    while (b-a > 4) {
-	unsigned n = be::get16(a+2);
-	if (n<4) throw tiff::Wedged {};
+    while (a < b) {
+	unsigned plen = prefix_of(*a);
+	if (b-a < plen+2) break;
+	unsigned n = be::get16(a+plen);
+	if (n < plen+2) throw tiff::Wedged {};
 	if (a+n > b) break;
 	acc.emplace_back(a, a+n);
 	a += n;
