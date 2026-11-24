@@ -69,7 +69,8 @@ namespace {
      * the clocks. Typically returns zero time, meaning we didn't find
      * any.
      */
-    dlt::Epoch::Ms system_time(const dlt::msg::Tag app, const dlt::msg::Log& msg)
+    dlt::Epoch::Ms system_time(const dlt::msg::Tag app,
+			       const dlt::msg::v1::Log& msg)
     {
 	if (msg.app != app) return {};
 	return ::system_time(msg.text);
@@ -78,7 +79,8 @@ namespace {
     /* The system timestamp to use for msg: either based on msg.ts and
      * the Epoch, or else the local processing timestamp.
      */
-    timeval time_of(const dlt::msg::Log& msg, std::unique_ptr<dlt::Epoch>& epoch, timeval local)
+    timeval time_of(const dlt::msg::v1::Log& msg,
+		    std::unique_ptr<dlt::Epoch>& epoch, timeval local)
     {
 	if (!epoch) return local;
 	auto ms = epoch->translate(msg.ts);
@@ -86,7 +88,7 @@ namespace {
     }
 }
 
-void Log::log(const timeval& tv, const dlt::msg::Log& msg)
+void Log::log(const timeval& tv, const dlt::msg::v1::Log& msg)
 {
     auto t = system_time(timesrc, msg);
     if (t.count()) {
@@ -98,6 +100,15 @@ void Log::log(const timeval& tv, const dlt::msg::Log& msg)
     const Color& c = select(msg.level, colors);
     msg.put(os(), time_of(msg, epoch, tv),
 	    with.ctx, with.ecu, c);
+    end();
+}
+
+void Log::log(const timeval&, const dlt::msg::v2::Log& msg)
+{
+    if (!grep.match(msg.app)) return;
+
+    const Color& c = select(msg.level, colors);
+    msg.put(os(), with.ctx, with.ecu, c);
     end();
 }
 
@@ -123,9 +134,23 @@ std::ostream& operator<< (std::ostream& os, const dlt::msg::LogLevel& val)
     return os << str(val);
 }
 
-std::ostream& dlt::msg::Log::put(std::ostream& os, const timeval& tv,
-				 bool with_ctx, bool with_ecu,
-				 const Color& c) const
+std::ostream& dlt::msg::v1::Log::put(std::ostream& os, const timeval& tv,
+				     bool with_ctx, bool with_ecu,
+				     const Color& c) const
+{
+    os << tv << SP2;
+    if (with_ecu) os << ecu << SP;
+    os << app << SP;
+    if (with_ctx) os << ctx << SP;
+    os << c << level << c.reset << SP
+       << text
+       << '\n';
+    return os;
+}
+
+std::ostream& dlt::msg::v2::Log::put(std::ostream& os,
+				     bool with_ctx, bool with_ecu,
+				     const Color& c) const
 {
     os << tv << SP2;
     if (with_ecu) os << ecu << SP;

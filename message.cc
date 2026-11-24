@@ -6,8 +6,6 @@
 
 #include "be.h"
 
-using dlt::msg::Log;
-
 namespace {
 
     bool unusual(unsigned htyp)
@@ -70,7 +68,7 @@ namespace {
  *       65 6e 74 73 20 3a 20 32
  *       00
  */
-Log::Log(Range r)
+dlt::msg::v1::Log::Log(Range r)
     : ts{}
 {
     auto a = r.begin();
@@ -90,6 +88,52 @@ Log::Log(Range r)
     // so I guess the rest is some junk around the string
     auto b = r.end();
     a += 6;
+    b--;
+    text = {a, b};
+    trimr(text);
+}
+
+/* As above, but for DLT v2. Example:
+ *
+ * htyp  5c 00 00 00
+ * mcnt  a9
+ * len   00 9a
+ * msin  21
+ * noar  01
+ * ns    e0 99 e2 11      endianness bug: COVESA/dlt-daemon e3bc133
+ * ts    00 6b 04 10 f8
+ * ecu   04 aa aa aa aa
+ * app   04 bb bb bb bb
+ * ctx   04 cc cc cc cc
+ *       00 00 02 fb
+ *       00 02 00
+ * len   00 6f
+ *       00
+ *       text ...
+ *       00
+ *
+ */
+dlt::msg::v2::Log::Log(Range r)
+    : tv{}
+{
+    auto a = r.begin();
+    const unsigned htyp = *a++;
+    if (htyp >> 5 != 2) return;
+    a += 6;
+    const unsigned msin = *a++;
+    if (not_log(msin)) return;
+    level = LogLevel { msin >> 4};
+    a += 1;
+
+    tv.tv_usec = le::get32(a) / 1000; a += 4;
+    tv.tv_sec  = be::get40(a); a += 5;
+
+    ecu = get<4>(++a); a += 4;
+    app = get<4>(++a); a += 4;
+    ctx = get<4>(++a); a += 4;
+
+    auto b = r.end();
+    a += 10;
     b--;
     text = {a, b};
     trimr(text);

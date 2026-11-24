@@ -128,6 +128,16 @@ namespace {
 	return 0;
     }
 
+    /* If the range contains a certain message type,
+     * pass it to the log.
+     */
+    template <class Msg>
+    void put(Log& log, const timeval& t, Range r)
+    {
+	const Msg msg {r};
+	if (msg.valid()) log.log(t, msg);
+    }
+
     void dltsink(Log& log, const addrinfo* ais)
     {
 	const timeval t0 = now();
@@ -156,9 +166,8 @@ namespace {
 
 	    const auto v = rx.messages();
 	    for (const Range& r : v) {
-		const dlt::msg::Log msg {r};
-		if (!msg.valid()) continue;
-		log.log(t, msg);
+		put<dlt::msg::v1::Log>(log, t, r);
+		put<dlt::msg::v2::Log>(log, t, r);
 	    }
 	    rx.consume(size(v));
 	}

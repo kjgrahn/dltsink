@@ -29,7 +29,9 @@ struct Log {
     void connect(const timeval&);
     void connect_fail(const timeval&, const std::string& err);
     void disconnect(const timeval&);
-    void log(const timeval&, const dlt::msg::Log&);
+
+    void log(const timeval&, const dlt::msg::v1::Log&);
+    void log(const timeval&, const dlt::msg::v2::Log&);
 
     bool broken = false;
 

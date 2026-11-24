@@ -24,27 +24,52 @@ namespace dlt {
 
 	struct LogLevel { unsigned val; };
 
-	/**
-	 * A DLT log message: text and various metadata. Might not be valid(),
-	 * in which case it was probably some other kind of message.
-	 *
-	 */
-	class Log {
-	public:
-	    explicit Log(Range);
-	    bool valid() const { return ts.count(); }
+	namespace v1 {
+	    /**
+	     * A DLT log message: text and various metadata. Might not be valid(),
+	     * in which case it was probably some other kind of message.
+	     *
+	     */
+	    class Log {
+	    public:
+		explicit Log(Range);
+		bool valid() const { return ts.count(); }
 
-	    std::ostream& put(std::ostream&, const timeval&,
-			      bool with_ctx, bool with_ecu,
-			      const Color&) const;
+		std::ostream& put(std::ostream&, const timeval&,
+				  bool with_ctx, bool with_ecu,
+				  const Color&) const;
 
-	    Tag ecu;
-	    Duration ts;
-	    Tag app;
-	    Tag ctx;
-	    LogLevel level;
-	    std::string text;
-	};
+		Tag ecu;
+		Duration ts;
+		Tag app;
+		Tag ctx;
+		LogLevel level;
+		std::string text;
+	    };
+	}
+
+	namespace v2 {
+	    /**
+	     * XXX
+	     *
+	     */
+	    class Log {
+	    public:
+		explicit Log(Range);
+		bool valid() const { return tv.tv_sec; }
+
+		std::ostream& put(std::ostream&,
+				  bool with_ctx, bool with_ecu,
+				  const Color&) const;
+
+		Tag ecu;
+		timeval tv;
+		Tag app;
+		Tag ctx;
+		LogLevel level;
+		std::string text;
+	    };
+	}
     }
 }
 
